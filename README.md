@@ -57,3 +57,26 @@ The system provides:
 
 ## 📁 Project Structure
 
+
+---
+
+## 🖼️ Screenshots
+
+### 🏠 Landing Page
+![Landing Page](images/landing.png)
+
+### 📝 Register Page
+![Register Page](images/register.png)
+
+### 🔑 Login Page
+![Login Page](images/login.png)
+
+> 📌 Create an `images` folder in the project root and place screenshots there.
+
+---
+
+## ⚙️ Backend Setup
+
+```bash
+git clone https://github.com/your-username/inventory-management-system.git
+cd backend
