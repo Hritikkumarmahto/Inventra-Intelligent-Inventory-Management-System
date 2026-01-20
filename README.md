@@ -80,3 +80,52 @@ The system provides:
 ```bash
 git clone https://github.com/your-username/inventory-management-system.git
 cd backend
+## ⚙️ Backend Setup
+
+Configure the database in `application.properties`:
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/inventory_db
+spring.datasource.username=root
+spring.datasource.password=yourpassword
+spring.jpa.hibernate.ddl-auto=update
+## ⚙️ Backend Setup
+
+Configure the database in `application.properties`:
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/inventory_db
+spring.datasource.username=root
+spring.datasource.password=yourpassword
+spring.jpa.hibernate.ddl-auto=update
+Run the backend server:
+
+bash
+Copy code
+./mvnw spring-boot:run
+🎨 Frontend Setup
+Navigate to the frontend directory:
+
+bash
+Copy code
+cd frontend
+npm install
+npm run dev
+The frontend application will run at:
+
+arduino
+Copy code
+http://localhost:5173
+🔐 API Endpoints (Authentication Only)
+Method	Endpoint	Description
+POST	/api/auth/register	Register a new user
+POST	/api/auth/login	Login user and generate JWT
+
+🧠 Next Planned Features
+Role-based dashboards (Admin / User)
+
+Inventory CRUD operations
+
+JWT authorization filters
+
+Logout and token expiration handling
