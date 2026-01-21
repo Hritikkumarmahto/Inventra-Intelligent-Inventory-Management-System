@@ -38,7 +38,15 @@ class AuthService {
       return { Authorization: 'Bearer ' + user.token };
     }
     return {};
+
   }
+  getToken() {
+    const user = JSON.parse(localStorage.getItem("user"));
+    return user?.token || null;
+  }
+
 }
 
 export default new AuthService();
+
+

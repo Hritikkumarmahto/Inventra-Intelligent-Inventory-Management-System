@@ -43,35 +43,66 @@
 
 // export default new ProductService();
 
+// import axios from "axios";
+// import authService from "./AuthService";
+
+// const API_URL = "http://localhost:8080/api/products";
+
+// const authHeader = () => ({
+//   headers: {
+//     Authorization: "Bearer " + authService.getToken(),
+//   },
+// });
+
+// const getAllProducts = () =>
+//   axios.get(`${API_URL}`, authHeader());
+
+// const createProduct = (data) =>
+//   axios.post(`${API_URL}`, data, authHeader());
+
+// const updateProduct = (id, data) =>
+//   axios.put(`${API_URL}/${id}`, data, authHeader());
+
+// const deleteProduct = (id) =>
+//   axios.delete(`${API_URL}/${id}`, authHeader());
+
+// const stockIn = (id, qty) =>
+//   axios.post(`${API_URL}/stock-in`, { productId: id, quantity: qty }, authHeader());
+
+// const stockOut = (id, qty) =>
+//   axios.post(`${API_URL}/stock-out`, { productId: id, quantity: qty }, authHeader());
+
+// const searchProducts = (term) =>
+//   axios.get(`${API_URL}/search?name=${term}`, authHeader());
+
+// export default {
+//   getAllProducts,
+//   createProduct,
+//   updateProduct,
+//   deleteProduct,
+//   stockIn,
+//   stockOut,
+//   searchProducts,
+// };
+
 import axios from "axios";
 import authService from "./AuthService";
 
 const API_URL = "http://localhost:8080/api/products";
 
-const authHeader = () => ({
-  headers: {
-    Authorization: "Bearer " + authService.getToken(),
-  },
-});
+const authHeader = () => {
+  const token = authService.getToken();
+  return {
+    headers: {
+      Authorization: token ? "Bearer " + token : "",
+    },
+  };
+};
 
-const getAllProducts = () =>
-  axios.get(`${API_URL}`, authHeader());
-
-const createProduct = (data) =>
-  axios.post(`${API_URL}`, data, authHeader());
-
-const updateProduct = (id, data) =>
-  axios.put(`${API_URL}/${id}`, data, authHeader());
-
-const deleteProduct = (id) =>
-  axios.delete(`${API_URL}/${id}`, authHeader());
-
-const stockIn = (id, qty) =>
-  axios.post(`${API_URL}/stock-in`, { productId: id, quantity: qty }, authHeader());
-
-const stockOut = (id, qty) =>
-  axios.post(`${API_URL}/stock-out`, { productId: id, quantity: qty }, authHeader());
-
+const getAllProducts = () => axios.get(API_URL, authHeader());
+const createProduct = (data) => axios.post(API_URL, data, authHeader());
+const updateProduct = (id, data) => axios.put(`${API_URL}/${id}`, data, authHeader());
+const deleteProduct = (id) => axios.delete(`${API_URL}/${id}`, authHeader());
 const searchProducts = (term) =>
   axios.get(`${API_URL}/search?name=${term}`, authHeader());
 
@@ -80,8 +111,5 @@ export default {
   createProduct,
   updateProduct,
   deleteProduct,
-  stockIn,
-  stockOut,
   searchProducts,
 };
-
