@@ -8,12 +8,16 @@ const AdminDashboard = () => {
   const [products, setProducts] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+
   const [formData, setFormData] = useState({
+    sku: "",
     name: "",
     description: "",
     category: "",
+    supplier: "",
     quantity: 0,
     price: 0,
+    minStockLevel: 5,
   });
 
   useEffect(() => {
@@ -66,13 +70,26 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleStockIn = async (id) => {
+    await productService.stockIn(id, 5);
+    loadProducts();
+  };
+
+  const handleStockOut = async (id) => {
+    await productService.stockOut(id, 5);
+    loadProducts();
+  };
+
   const resetForm = () => {
     setFormData({
+      sku: "",
       name: "",
       description: "",
       category: "",
+      supplier: "",
       quantity: 0,
       price: 0,
+      minStockLevel: 5,
     });
     setEditingProduct(null);
     setShowForm(false);
@@ -100,6 +117,18 @@ const AdminDashboard = () => {
         <div style={styles.formCard}>
           <h3>{editingProduct ? "Edit Product" : "Add New Product"}</h3>
           <form onSubmit={handleSubmit} style={styles.form}>
+
+            <input
+              type="text"
+              placeholder="SKU"
+              value={formData.sku}
+              onChange={(e) =>
+                setFormData({ ...formData, sku: e.target.value })
+              }
+              required
+              style={styles.input}
+            />
+
             <input
               type="text"
               placeholder="Product Name"
@@ -110,6 +139,7 @@ const AdminDashboard = () => {
               required
               style={styles.input}
             />
+
             <textarea
               placeholder="Description"
               value={formData.description}
@@ -118,6 +148,7 @@ const AdminDashboard = () => {
               }
               style={styles.textarea}
             />
+
             <input
               type="text"
               placeholder="Category"
@@ -128,27 +159,61 @@ const AdminDashboard = () => {
               required
               style={styles.input}
             />
+
+            <input
+              type="text"
+              placeholder="Supplier"
+              value={formData.supplier}
+              onChange={(e) =>
+                setFormData({ ...formData, supplier: e.target.value })
+              }
+              required
+              style={styles.input}
+            />
+
             <input
               type="number"
               placeholder="Quantity"
               value={formData.quantity}
               onChange={(e) =>
-                setFormData({ ...formData, quantity: parseInt(e.target.value) })
+                setFormData({
+                  ...formData,
+                  quantity: parseInt(e.target.value),
+                })
               }
               required
               style={styles.input}
             />
+
             <input
               type="number"
               step="0.01"
-              placeholder="Price"
+              placeholder="Unit Price"
               value={formData.price}
               onChange={(e) =>
-                setFormData({ ...formData, price: parseFloat(e.target.value) })
+                setFormData({
+                  ...formData,
+                  price: parseFloat(e.target.value),
+                })
               }
               required
               style={styles.input}
             />
+
+            <input
+              type="number"
+              placeholder="Minimum Stock Level"
+              value={formData.minStockLevel}
+              onChange={(e) =>
+                setFormData({
+                  ...formData,
+                  minStockLevel: parseInt(e.target.value),
+                })
+              }
+              required
+              style={styles.input}
+            />
+
             <button type="submit" style={styles.submitBtn}>
               {editingProduct ? "Update" : "Create"}
             </button>
@@ -159,13 +224,21 @@ const AdminDashboard = () => {
       <div style={styles.productsGrid}>
         {products.map((product) => (
           <div key={product.id} style={styles.productCard}>
+            {product.quantity <= product.minStockLevel && (
+              <div style={styles.lowStockBadge}>⚠ Low Stock</div>
+            )}
+
             <h3>{product.name}</h3>
             <p>{product.description}</p>
+
             <div style={styles.productInfo}>
+              <span>SKU: {product.sku}</span>
               <span>Category: {product.category}</span>
+              <span>Supplier: {product.supplier}</span>
               <span>Qty: {product.quantity}</span>
-              <span>Price: ${product.price}</span>
+              <span>Price: ₹{product.price}</span>
             </div>
+
             <div style={styles.actions}>
               <button
                 onClick={() => handleEdit(product)}
@@ -173,11 +246,26 @@ const AdminDashboard = () => {
               >
                 Edit
               </button>
+
               <button
                 onClick={() => handleDelete(product.id)}
                 style={styles.deleteBtn}
               >
                 Delete
+              </button>
+
+              <button
+                onClick={() => handleStockIn(product.id)}
+                style={styles.stockBtn}
+              >
+                + Stock
+              </button>
+
+              <button
+                onClick={() => handleStockOut(product.id)}
+                style={styles.stockOutBtn}
+              >
+                - Stock
               </button>
             </div>
           </div>
@@ -189,110 +277,25 @@ const AdminDashboard = () => {
 
 const styles = {
   container: { padding: "20px", maxWidth: "1400px", margin: "0 auto" },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "30px",
-  },
+  header: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" },
   headerRight: { display: "flex", gap: "15px", alignItems: "center" },
   userName: { fontWeight: "600", color: "#555" },
-  logoutBtn: {
-    padding: "8px 20px",
-    background: "#dc3545",
-    color: "white",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-  },
-  addBtn: {
-    padding: "12px 25px",
-    background: "#667eea",
-    color: "white",
-    border: "none",
-    borderRadius: "8px",
-    fontSize: "1rem",
-    fontWeight: "bold",
-    cursor: "pointer",
-    marginBottom: "20px",
-  },
-  formCard: {
-    background: "white",
-    padding: "25px",
-    borderRadius: "10px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-    marginBottom: "30px",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px",
-    marginTop: "15px",
-  },
-  input: {
-    padding: "12px",
-    border: "2px solid #e0e0e0",
-    borderRadius: "6px",
-    fontSize: "1rem",
-  },
-  textarea: {
-    padding: "12px",
-    border: "2px solid #e0e0e0",
-    borderRadius: "6px",
-    fontSize: "1rem",
-    minHeight: "100px",
-    resize: "vertical",
-  },
-  submitBtn: {
-    padding: "12px",
-    background: "#28a745",
-    color: "white",
-    border: "none",
-    borderRadius: "6px",
-    fontSize: "1rem",
-    fontWeight: "bold",
-    cursor: "pointer",
-  },
-  productsGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-    gap: "20px",
-  },
-  productCard: {
-    background: "white",
-    padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-  },
-  productInfo: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-    margin: "15px 0",
-    color: "#666",
-    fontSize: "0.9rem",
-  },
-  actions: { display: "flex", gap: "10px", marginTop: "15px" },
-  editBtn: {
-    flex: 1,
-    padding: "8px",
-    background: "#ffc107",
-    color: "#333",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontWeight: "600",
-  },
-  deleteBtn: {
-    flex: 1,
-    padding: "8px",
-    background: "#dc3545",
-    color: "white",
-    border: "none",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontWeight: "600",
-  },
+  logoutBtn: { padding: "8px 20px", background: "#dc3545", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" },
+  addBtn: { padding: "12px 25px", background: "#667eea", color: "white", border: "none", borderRadius: "8px", fontSize: "1rem", fontWeight: "bold", cursor: "pointer", marginBottom: "20px" },
+  formCard: { background: "white", padding: "25px", borderRadius: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.1)", marginBottom: "30px" },
+  form: { display: "flex", flexDirection: "column", gap: "15px", marginTop: "15px" },
+  input: { padding: "12px", border: "2px solid #e0e0e0", borderRadius: "6px", fontSize: "1rem" },
+  textarea: { padding: "12px", border: "2px solid #e0e0e0", borderRadius: "6px", fontSize: "1rem", minHeight: "100px", resize: "vertical" },
+  submitBtn: { padding: "12px", background: "#28a745", color: "white", border: "none", borderRadius: "6px", fontSize: "1rem", fontWeight: "bold", cursor: "pointer" },
+  productsGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "20px" },
+  productCard: { background: "white", padding: "20px", borderRadius: "10px", boxShadow: "0 2px 10px rgba(0,0,0,0.1)" },
+  productInfo: { display: "flex", flexDirection: "column", gap: "8px", margin: "15px 0", color: "#666", fontSize: "0.9rem" },
+  actions: { display: "flex", gap: "10px", flexWrap: "wrap" },
+  editBtn: { flex: 1, padding: "8px", background: "#ffc107", border: "none", borderRadius: "5px", cursor: "pointer" },
+  deleteBtn: { flex: 1, padding: "8px", background: "#dc3545", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" },
+  stockBtn: { flex: 1, padding: "8px", background: "#17a2b8", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" },
+  stockOutBtn: { flex: 1, padding: "8px", background: "#6f42c1", color: "white", border: "none", borderRadius: "5px", cursor: "pointer" },
+  lowStockBadge: { background: "#ffcccc", color: "#b30000", padding: "6px 10px", borderRadius: "6px", fontSize: "0.8rem", fontWeight: "bold", marginBottom: "10px" },
 };
 
 export default AdminDashboard;
