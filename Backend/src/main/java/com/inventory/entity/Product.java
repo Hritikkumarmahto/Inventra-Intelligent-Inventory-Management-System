@@ -22,6 +22,15 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    @Column(unique = true, nullable = false)
+    private String sku;
+
+    @Column(nullable = false)
+    private String supplier;
+
+    @Column(nullable = false)
+    private Integer minStockLevel;
+
     @Column(length = 1000)
     private String description;
 

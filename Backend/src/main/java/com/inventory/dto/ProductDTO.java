@@ -18,6 +18,12 @@ public class ProductDTO {
     @NotBlank(message = "Product name is required")
     private String name;
 
+    private String sku;
+
+    private String supplier;
+
+    private Integer minStockLevel;
+
     private String description;
 
     @NotBlank(message = "Category is required")
